@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
+use Prism\Prism\Facades\Prism;
 
 Route::get('/', function () {
     return Inertia::render('welcome', [
@@ -23,6 +24,28 @@ Route::middleware(['auth', 'verified'])->group(function () {
         );
 
         return response()->json(['status' => 'processing']);
+    });
+
+    Route::post('/chat', function (Request $request) {
+        $data = $request->input();
+
+        $text = '';
+        if (isset($data['messages']) && is_array($data['messages'])) {
+            foreach ($data['messages'] as $message) {
+                if (isset($message['parts']) && is_array($message['parts'])) {
+                    foreach ($message['parts'] as $part) {
+                        if ($part['type'] === 'text') {
+                            $text .= $part['text'];
+                        }
+                    }
+                }
+            }
+        }
+
+        return Prism::text()
+            ->using('openai', 'gpt-4.1-mini')
+            ->withPrompt($text)
+            ->asDataStreamResponse();
     });
 });
 

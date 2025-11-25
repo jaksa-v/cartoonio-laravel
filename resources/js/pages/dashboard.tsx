@@ -1,5 +1,4 @@
-import { Button } from '@/components/ui/button';
-import { useAiStream } from '@/hooks/use-ai-stream';
+import ChatSdk from '@/components/chat/chat-sdk';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
@@ -13,16 +12,11 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Dashboard() {
-    const { message, handleSubmit } = useAiStream('/chat-broadcast');
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                <form onSubmit={handleSubmit}>
-                    <Button type="submit">Send</Button>
-                </form>
-                <p>{message}</p>
+                <ChatSdk />
             </div>
         </AppLayout>
     );
