@@ -1,0 +1,14 @@
+{
+    "agents": [
+        "cursor",
+        "opencode"
+    ],
+    "editors": [
+        "cursor",
+        "opencode"
+    ],
+    "guidelines": [
+        "laravel/fortify",
+        "prism-php/prism"
+    ]
+}
