@@ -42,6 +42,16 @@ export interface User {
     [key: string]: unknown; // This allows for additional properties...
 }
 
+export interface Creation {
+    id: number;
+    prompt: string;
+    input_image_path: string;
+    output_image_path: string | null;
+    status: 'pending' | 'processing' | 'completed' | 'failed';
+    error_message: string | null;
+    created_at: string;
+}
+
 // Prism Streaming Event Types
 export interface StreamStartEvent {
     id: string;

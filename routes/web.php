@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CreationController;
 use App\Jobs\ProcessAiStreamJob;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -14,9 +15,11 @@ Route::get('/', function () {
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
+    Route::get('dashboard', [CreationController::class, 'index'])->name('dashboard');
+    Route::post('creations', [CreationController::class, 'store'])->name('creations.store');
+    Route::get('creations/{creation}', [CreationController::class, 'show'])->name('creations.show');
+    Route::get('creations/{creation}/image/{type}', [CreationController::class, 'image'])->name('creations.image');
+    Route::delete('creations/{creation}', [CreationController::class, 'destroy'])->name('creations.destroy');
 
     Route::post('/chat-broadcast', function (Request $request) {
         ProcessAiStreamJob::dispatch(
