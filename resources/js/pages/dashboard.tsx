@@ -7,6 +7,7 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
+import { useCreationUpdates } from '@/hooks/use-creation-updates';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import { type BreadcrumbItem, type Creation } from '@/types';
@@ -24,6 +25,8 @@ type Props = {
 };
 
 export default function Dashboard({ creations }: Props) {
+    useCreationUpdates();
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />

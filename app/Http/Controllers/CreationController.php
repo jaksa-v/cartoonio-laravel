@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\CreationStatus;
 use App\Http\Requests\StoreCreationRequest;
+use App\Jobs\ProcessCreationJob;
 use App\Models\Creation;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -34,11 +36,13 @@ class CreationController extends Controller
     {
         $path = $request->file('image')->store('creations', 'local');
 
-        $request->user()->creations()->create([
+        $creation = $request->user()->creations()->create([
             'prompt' => $request->validated('prompt'),
             'input_image_path' => $path,
-            'status' => 'pending',
+            'status' => CreationStatus::Pending,
         ]);
+
+        ProcessCreationJob::dispatch($creation->id);
 
         return to_route('dashboard');
     }
