@@ -2,8 +2,12 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Creation;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Storage;
+use Prism\Prism\Enums\Provider;
 use Prism\Prism\Facades\Prism;
+use Prism\Prism\ValueObjects\Media\Image;
 
 class TestImageGen extends Command
 {
@@ -26,18 +30,20 @@ class TestImageGen extends Command
      */
     public function handle()
     {
+        $creation = Creation::query()->findOrFail(12);
+        $imagePath = Storage::disk('local')->path($creation->input_image_path);
+
         $response = Prism::image()
-            ->using('openai', 'gpt-image-1')
-            ->withPrompt('A cute baby sea otter floating on its back in calm blue water')
-            ->withProviderOptions([
-                'size' => '1024x1024',
-                'n' => 1,
-            ])
-            ->withClientOptions(['timeout' => 120])
+            ->using(Provider::Gemini, 'gemini-2.5-flash-image')
+            ->withPrompt('Make this image look like it was from a South Park episode', [
+                Image::fromLocalPath($imagePath)]
+            )
             ->generate();
 
-        $this->info('Has images: '.$response->hasImages());
-        $this->info('First image: '.$response->firstImage());
         $this->info('Image count: '.$response->imageCount());
+
+        $imageData = base64_decode($response->firstImage()->base64);
+        $outputPath = 'test_image.png';
+        Storage::disk('local')->put($outputPath, $imageData);
     }
 }

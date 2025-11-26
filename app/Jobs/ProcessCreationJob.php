@@ -11,6 +11,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Storage;
+use Prism\Prism\Enums\Provider;
 use Prism\Prism\Facades\Prism;
 use Prism\Prism\ValueObjects\Media\Image;
 
@@ -41,13 +42,9 @@ class ProcessCreationJob implements ShouldQueue
             $inputPath = Storage::disk('local')->path($creation->input_image_path);
 
             $response = Prism::image()
-                ->using('openai', 'gpt-image-1')
+                ->using(Provider::Gemini, 'gemini-2.5-flash-image')
                 ->withPrompt($creation->prompt, [
                     Image::fromLocalPath($inputPath),
-                ])
-                ->withProviderOptions([
-                    'size' => '1024x1024',
-                    'n' => 1,
                 ])
                 ->withClientOptions(['timeout' => 120])
                 ->generate();
