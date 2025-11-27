@@ -12,26 +12,31 @@ interface CreationUpdatedEvent {
     };
 }
 
-export function useCreationUpdates() {
+export function useCreationUpdates(
+    propName: 'creations' | 'latestCreation' = 'creations',
+) {
     const { auth } = usePage<SharedData>().props;
     const isReloadingRef = useRef(false);
 
-    const handleCreationUpdate = useCallback((event: CreationUpdatedEvent) => {
-        console.log('Creation updated:', event);
+    const handleCreationUpdate = useCallback(
+        (event: CreationUpdatedEvent) => {
+            console.log('Creation updated:', event);
 
-        if (isReloadingRef.current) {
-            return;
-        }
+            if (isReloadingRef.current) {
+                return;
+            }
 
-        isReloadingRef.current = true;
+            isReloadingRef.current = true;
 
-        router.reload({
-            only: ['creations'],
-            onFinish: () => {
-                isReloadingRef.current = false;
-            },
-        });
-    }, []);
+            router.reload({
+                only: [propName],
+                onFinish: () => {
+                    isReloadingRef.current = false;
+                },
+            });
+        },
+        [propName],
+    );
 
     useEcho<CreationUpdatedEvent>(
         `creations.${auth.user.id}`,

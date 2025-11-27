@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\CreationStatus;
+use App\Events\CreationUpdated;
 use App\Http\Requests\StoreCreationRequest;
 use App\Jobs\ProcessCreationJob;
 use App\Models\Creation;
@@ -15,17 +16,32 @@ use Inertia\Response;
 class CreationController extends Controller
 {
     /**
-     * Display the dashboard with creations.
+     * Display gallery with paginated creations.
      */
     public function index(Request $request): Response
     {
         $creations = $request->user()
             ->creations()
             ->latest()
-            ->get();
+            ->paginate(20);
 
-        return Inertia::render('dashboard', [
+        return Inertia::render('creations/gallery', [
             'creations' => $creations,
+        ]);
+    }
+
+    /**
+     * Show creation form page.
+     */
+    public function create(Request $request): Response
+    {
+        $latestCreation = $request->user()
+            ->creations()
+            ->latest()
+            ->first();
+
+        return Inertia::render('creations/create', [
+            'latestCreation' => $latestCreation,
         ]);
     }
 
@@ -42,9 +58,11 @@ class CreationController extends Controller
             'status' => CreationStatus::Pending,
         ]);
 
+        broadcast(new CreationUpdated($creation));
+
         ProcessCreationJob::dispatch($creation->id);
 
-        return to_route('dashboard');
+        return to_route('creations.create');
     }
 
     /**
@@ -56,7 +74,7 @@ class CreationController extends Controller
             abort(403);
         }
 
-        return Inertia::render('creation-show', [
+        return Inertia::render('creations/show', [
             'creation' => $creation,
         ]);
     }
@@ -100,6 +118,6 @@ class CreationController extends Controller
 
         $creation->delete();
 
-        return to_route('dashboard');
+        return to_route('creations.index');
     }
 }

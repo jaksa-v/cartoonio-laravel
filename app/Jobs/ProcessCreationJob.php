@@ -37,7 +37,7 @@ class ProcessCreationJob implements ShouldQueue
 
         try {
             $creation->update(['status' => CreationStatus::Processing]);
-            broadcast(new CreationUpdated($creation))->toOthers();
+            broadcast(new CreationUpdated($creation));
 
             $inputPath = Storage::disk('local')->path($creation->input_image_path);
 
@@ -60,7 +60,7 @@ class ProcessCreationJob implements ShouldQueue
                 'status' => CreationStatus::Completed,
             ]);
 
-            broadcast(new CreationUpdated($creation))->toOthers();
+            broadcast(new CreationUpdated($creation));
 
         } catch (\Exception $e) {
             $creation->update([
@@ -68,7 +68,7 @@ class ProcessCreationJob implements ShouldQueue
                 'error_message' => 'Image generation failed: '.$e->getMessage(),
             ]);
 
-            broadcast(new CreationUpdated($creation))->toOthers();
+            broadcast(new CreationUpdated($creation));
 
             throw $e;
         }
@@ -84,7 +84,7 @@ class ProcessCreationJob implements ShouldQueue
                 'error_message' => 'Failed after retries: '.$exception->getMessage(),
             ]);
 
-            broadcast(new CreationUpdated($creation))->toOthers();
+            broadcast(new CreationUpdated($creation));
         }
     }
 }

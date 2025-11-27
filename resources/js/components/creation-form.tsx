@@ -10,21 +10,29 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { Spinner } from '@/components/ui/spinner';
 import { CARTOON_STYLES } from '@/lib/cartoon-styles';
 import { Form } from '@inertiajs/react';
 import { useState } from 'react';
 
-export function CreationForm() {
-    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+type CreationFormProps = {
+    onImageChange: (url: string | null) => void;
+    isSubmitting: boolean;
+};
+
+export function CreationForm({
+    onImageChange,
+    isSubmitting,
+}: CreationFormProps) {
     const [selectedStyle, setSelectedStyle] = useState<string>('');
     const [customText, setCustomText] = useState<string>('');
 
     function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
         const file = e.target.files?.[0];
         if (file) {
-            setPreviewUrl(URL.createObjectURL(file));
+            onImageChange(URL.createObjectURL(file));
         } else {
-            setPreviewUrl(null);
+            onImageChange(null);
         }
     }
 
@@ -46,13 +54,8 @@ export function CreationForm() {
             {...CreationController.store.form()}
             options={{
                 preserveScroll: true,
+                preserveState: true,
             }}
-            onSuccess={() => {
-                setPreviewUrl(null);
-                setSelectedStyle('');
-                setCustomText('');
-            }}
-            resetOnSuccess
             className="space-y-6"
         >
             {({ processing, errors }) => (
@@ -66,21 +69,11 @@ export function CreationForm() {
                             name="image"
                             accept="image/jpeg,image/png,image/webp"
                             required
+                            disabled={processing || isSubmitting}
                             onChange={handleImageChange}
-                            disabled={processing}
                         />
 
                         <InputError message={errors.image} />
-
-                        {previewUrl && (
-                            <div className="mt-4">
-                                <img
-                                    src={previewUrl}
-                                    alt="Preview"
-                                    className="max-h-64 rounded-lg border object-contain"
-                                />
-                            </div>
-                        )}
                     </div>
 
                     <div className="grid gap-2">
@@ -89,7 +82,7 @@ export function CreationForm() {
                         <Select
                             value={selectedStyle}
                             onValueChange={setSelectedStyle}
-                            disabled={processing}
+                            disabled={processing || isSubmitting}
                         >
                             <SelectTrigger id="style">
                                 <SelectValue placeholder="Choose a cartoon style..." />
@@ -120,7 +113,7 @@ export function CreationForm() {
                             value={customText}
                             onChange={(e) => setCustomText(e.target.value)}
                             maxLength={500}
-                            disabled={processing}
+                            disabled={processing || isSubmitting}
                             placeholder="e.g., wearing sunglasses, smiling"
                         />
 
@@ -137,10 +130,17 @@ export function CreationForm() {
 
                     <Button
                         type="submit"
-                        disabled={processing || !selectedStyle}
+                        disabled={processing || isSubmitting || !selectedStyle}
                         className="w-full"
                     >
-                        {processing ? 'Uploading...' : 'Generate'}
+                        {processing || isSubmitting ? (
+                            <>
+                                <Spinner className="mr-2 size-4" />
+                                Uploading...
+                            </>
+                        ) : (
+                            'Generate'
+                        )}
                     </Button>
                 </>
             )}

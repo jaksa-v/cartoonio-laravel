@@ -15,7 +15,9 @@ Route::get('/', function () {
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', [CreationController::class, 'index'])->name('dashboard');
+    Route::get('gallery', [CreationController::class, 'index'])->name('creations.index');
+    Route::get('create', [CreationController::class, 'create'])->name('creations.create');
+    Route::redirect('dashboard', 'gallery')->name('dashboard');
     Route::post('creations', [CreationController::class, 'store'])->name('creations.store');
     Route::get('creations/{creation}', [CreationController::class, 'show'])->name('creations.show');
     Route::get('creations/{creation}/image/{type}', [CreationController::class, 'image'])->name('creations.image');
