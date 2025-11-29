@@ -1,19 +1,8 @@
 [phases.setup]
-nixPkgs = [
-  "php",
-  "nginx",
-  "nodejs_22",
-  "python311Packages.supervisor"
-]
+nixPkgs = ["...", "python311Packages.supervisor"]
 
 [phases.build]
 cmds = [
-    "php -r \"copy('https://getcomposer.org/installer', 'composer-setup.php');\"",
-    "php composer-setup.php --install-dir=/usr/local/bin --filename=composer",
-    "php -r \"unlink('composer-setup.php');\"",
-
-    "corepack enable pnpm",
-
     "mkdir -p /etc/supervisor/conf.d/",
     "cp /assets/worker-*.conf /etc/supervisor/conf.d/",
     "cp /assets/supervisord.conf /etc/supervisord.conf",
