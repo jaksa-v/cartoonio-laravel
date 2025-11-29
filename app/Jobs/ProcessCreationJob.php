@@ -10,7 +10,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Storage;
 use Prism\Prism\Enums\Provider;
 use Prism\Prism\Facades\Prism;
 use Prism\Prism\ValueObjects\Media\Image;
@@ -39,7 +38,7 @@ class ProcessCreationJob implements ShouldQueue
             $creation->update(['status' => CreationStatus::Processing]);
             broadcast(new CreationUpdated($creation));
 
-            $inputImageData = Storage::disk('s3')->get($creation->input_image_path);
+            $inputImageData = $creation->user->getEncrypted($creation->input_image_path);
             $tempPath = sys_get_temp_dir().'/'.uniqid('creation_', true).'.png';
             file_put_contents($tempPath, $inputImageData);
 
@@ -57,7 +56,7 @@ class ProcessCreationJob implements ShouldQueue
             $imageData = base64_decode($editedImage->base64);
 
             $outputPath = 'creations/output_'.time().'_'.basename($creation->input_image_path);
-            Storage::disk('s3')->put($outputPath, $imageData);
+            $creation->user->putEncrypted($outputPath, $imageData);
 
             $creation->update([
                 'output_image_path' => $outputPath,

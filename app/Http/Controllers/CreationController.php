@@ -50,7 +50,7 @@ class CreationController extends Controller
      */
     public function store(StoreCreationRequest $request): RedirectResponse
     {
-        $path = $request->file('image')->store('creations', 's3');
+        $path = $request->user()->storeEncrypted($request->file('image'), 'creations');
 
         $creation = $request->user()->creations()->create([
             'prompt' => $request->validated('prompt'),
@@ -98,7 +98,10 @@ class CreationController extends Controller
             abort(404);
         }
 
-        return Storage::disk('s3')->response($path);
+        $decrypted = $request->user()->getEncrypted($path);
+
+        return response($decrypted)
+            ->header('Content-Type', 'image/png');
     }
 
     /**
@@ -110,10 +113,10 @@ class CreationController extends Controller
             abort(403);
         }
 
-        Storage::disk('s3')->delete($creation->input_image_path);
+        $request->user()->deleteEncrypted($creation->input_image_path);
 
         if ($creation->output_image_path) {
-            Storage::disk('s3')->delete($creation->output_image_path);
+            $request->user()->deleteEncrypted($creation->output_image_path);
         }
 
         $creation->delete();
