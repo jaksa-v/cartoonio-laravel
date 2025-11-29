@@ -50,7 +50,7 @@ class CreationController extends Controller
      */
     public function store(StoreCreationRequest $request): RedirectResponse
     {
-        $path = $request->file('image')->store('creations', 'local');
+        $path = $request->file('image')->store('creations', 's3');
 
         $creation = $request->user()->creations()->create([
             'prompt' => $request->validated('prompt'),
@@ -94,11 +94,11 @@ class CreationController extends Controller
             default => abort(404),
         };
 
-        if (! $path || ! Storage::disk('local')->exists($path)) {
+        if (! $path || ! Storage::disk('s3')->exists($path)) {
             abort(404);
         }
 
-        return Storage::disk('local')->response($path);
+        return Storage::disk('s3')->response($path);
     }
 
     /**
@@ -110,10 +110,10 @@ class CreationController extends Controller
             abort(403);
         }
 
-        Storage::disk('local')->delete($creation->input_image_path);
+        Storage::disk('s3')->delete($creation->input_image_path);
 
         if ($creation->output_image_path) {
-            Storage::disk('local')->delete($creation->output_image_path);
+            Storage::disk('s3')->delete($creation->output_image_path);
         }
 
         $creation->delete();
