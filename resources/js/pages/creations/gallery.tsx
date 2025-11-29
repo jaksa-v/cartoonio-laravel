@@ -114,12 +114,12 @@ export default function Gallery({ creations }: Props) {
                                 <CardContent className="flex flex-col items-center justify-center py-12 text-center">
                                     <p className="text-sm text-muted-foreground">
                                         No creations yet. Create your first
-                                        artwork!
+                                        generation!
                                     </p>
                                     <Link href="/create">
                                         <Button className="mt-4">
                                             <Plus className="mr-2 size-4" />
-                                            Create Artwork
+                                            Create Generation
                                         </Button>
                                     </Link>
                                 </CardContent>

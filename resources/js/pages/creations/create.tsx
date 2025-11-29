@@ -73,7 +73,7 @@ export default function Create({ latestCreation }: Props) {
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <div className="mx-auto w-full max-w-7xl">
                     <h1 className="mb-6 text-3xl font-bold tracking-tight">
-                        Create Artwork
+                        Create Generation
                     </h1>
 
                     <div className="grid gap-6 lg:grid-cols-2">
