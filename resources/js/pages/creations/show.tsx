@@ -1,12 +1,13 @@
 import CreationController from '@/actions/App/Http/Controllers/CreationController';
 import { CreationImagesGrid } from '@/components/creation-images-grid';
 import { CreationStatusBadge } from '@/components/creation-status-badge';
+import { DeleteCreationDialog } from '@/components/delete-creation-dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type Creation } from '@/types';
 import { Head, Link } from '@inertiajs/react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Trash2 } from 'lucide-react';
 
 type Props = {
     creation: Creation;
@@ -40,12 +41,19 @@ export default function CreationShow({ creation }: Props) {
                                 {new Date(creation.created_at).toLocaleString()}
                             </p>
                         </div>
-                        <Link href="/gallery">
-                            <Button variant="outline" size="lg">
-                                <ArrowLeft className="mr-2 size-4" />
-                                Back to Gallery
-                            </Button>
-                        </Link>
+                        <div className="flex items-center gap-2">
+                            <DeleteCreationDialog creationId={creation.id}>
+                                <Button variant="destructive" size="icon">
+                                    <Trash2 className="size-4" />
+                                </Button>
+                            </DeleteCreationDialog>
+                            <Link href="/gallery">
+                                <Button variant="outline" size="lg">
+                                    <ArrowLeft className="mr-2 size-4" />
+                                    Back to Gallery
+                                </Button>
+                            </Link>
+                        </div>
                     </div>
 
                     <Card>

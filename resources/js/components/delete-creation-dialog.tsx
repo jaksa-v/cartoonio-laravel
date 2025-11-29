@@ -9,16 +9,35 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
-import { Form } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
+import { type ReactNode, useState } from 'react';
 import { Trash2 } from 'lucide-react';
 
-export function DeleteCreationDialog({ creationId }: { creationId: number }) {
+export function DeleteCreationDialog({
+    creationId,
+    children,
+}: {
+    creationId: number;
+    children?: ReactNode;
+}) {
+    const [isDeleting, setIsDeleting] = useState(false);
+
+    const handleDelete = () => {
+        setIsDeleting(true);
+        router.delete(CreationController.destroy.url(creationId), {
+            preserveScroll: true,
+            onFinish: () => setIsDeleting(false),
+        });
+    };
+
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button variant="destructive" size="sm">
-                    <Trash2 className="size-4" />
-                </Button>
+                {children ?? (
+                    <Button variant="destructive" size="sm">
+                        <Trash2 className="size-4" />
+                    </Button>
+                )}
             </DialogTrigger>
             <DialogContent>
                 <DialogTitle>Delete Creation</DialogTitle>
@@ -27,28 +46,19 @@ export function DeleteCreationDialog({ creationId }: { creationId: number }) {
                     cannot be undone.
                 </DialogDescription>
 
-                <Form
-                    {...CreationController.destroy.form(creationId)}
-                    options={{
-                        preserveScroll: true,
-                    }}
-                >
-                    {({ processing }) => (
-                        <DialogFooter className="gap-2">
-                            <DialogClose asChild>
-                                <Button variant="secondary">Cancel</Button>
-                            </DialogClose>
+                <DialogFooter className="gap-2">
+                    <DialogClose asChild>
+                        <Button variant="secondary">Cancel</Button>
+                    </DialogClose>
 
-                            <Button
-                                variant="destructive"
-                                disabled={processing}
-                                asChild
-                            >
-                                <button type="submit">Delete</button>
-                            </Button>
-                        </DialogFooter>
-                    )}
-                </Form>
+                    <Button
+                        variant="destructive"
+                        disabled={isDeleting}
+                        onClick={handleDelete}
+                    >
+                        Delete
+                    </Button>
+                </DialogFooter>
             </DialogContent>
         </Dialog>
     );
