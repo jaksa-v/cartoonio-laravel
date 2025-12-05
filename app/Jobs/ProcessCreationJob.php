@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\CreationStatus;
+use App\Enums\CreationStatus;
 use App\Events\CreationUpdated;
 use App\Models\Creation;
 use Exception;

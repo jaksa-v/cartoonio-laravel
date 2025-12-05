@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\CreationStatus;
+use App\Enums\CreationStatus;
 use App\Events\CreationUpdated;
 use App\Http\Requests\StoreCreationRequest;
 use App\Jobs\ProcessCreationJob;
