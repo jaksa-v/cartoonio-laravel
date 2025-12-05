@@ -7,6 +7,7 @@ use App\Events\CreationUpdated;
 use App\Http\Requests\StoreCreationRequest;
 use App\Jobs\ProcessCreationJob;
 use App\Models\Creation;
+use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -82,16 +83,19 @@ class CreationController extends Controller
     /**
      * Serve creation image.
      */
-    public function image(Request $request, Creation $creation, string $type): mixed
+    public function image(Request $request, Creation $creation, string $type): ResponseFactory|\Illuminate\Http\Response
     {
         if ($creation->user_id !== $request->user()->id) {
             abort(403);
         }
 
+        if (! in_array($type, ['input', 'output'])) {
+            abort(404);
+        }
+
         $path = match ($type) {
             'input' => $creation->input_image_path,
             'output' => $creation->output_image_path,
-            default => abort(404),
         };
 
         if (! $path || ! Storage::disk('s3')->exists($path)) {

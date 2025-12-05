@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\CreationStatus;
 use App\Events\CreationUpdated;
 use App\Models\Creation;
+use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -13,6 +14,7 @@ use Illuminate\Queue\SerializesModels;
 use Prism\Prism\Enums\Provider;
 use Prism\Prism\Facades\Prism;
 use Prism\Prism\ValueObjects\Media\Image;
+use Throwable;
 
 class ProcessCreationJob implements ShouldQueue
 {
@@ -26,6 +28,9 @@ class ProcessCreationJob implements ShouldQueue
         public int $creationId
     ) {}
 
+    /**
+     * @throws Exception
+     */
     public function handle(): void
     {
         $creation = Creation::find($this->creationId);
@@ -65,7 +70,7 @@ class ProcessCreationJob implements ShouldQueue
 
             broadcast(new CreationUpdated($creation));
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $creation->update([
                 'status' => CreationStatus::Failed,
                 'error_message' => 'Image generation failed: '.$e->getMessage(),
@@ -77,7 +82,7 @@ class ProcessCreationJob implements ShouldQueue
         }
     }
 
-    public function failed(\Throwable $exception): void
+    public function failed(Throwable $exception): void
     {
         $creation = Creation::find($this->creationId);
 

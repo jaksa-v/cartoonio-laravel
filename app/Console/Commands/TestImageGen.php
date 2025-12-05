@@ -28,7 +28,7 @@ class TestImageGen extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): void
     {
         $creation = Creation::query()->findOrFail(12);
         $imagePath = Storage::disk('local')->path($creation->input_image_path);

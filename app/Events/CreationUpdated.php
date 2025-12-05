@@ -20,7 +20,7 @@ class CreationUpdated implements ShouldBroadcast
 
     public function broadcastOn(): Channel
     {
-        return new PrivateChannel('creations.' . $this->creation->user_id);
+        return new PrivateChannel('creations.'.$this->creation->user_id);
     }
 
     public function broadcastAs(): string
